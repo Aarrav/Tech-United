@@ -1,0 +1,5 @@
+(sym_lib_table
+  (version 7)
+  (lib (name "BoosterPowerPcb")(type "KiCad")(uri "${KIPRJMOD}/BoosterPowerPcb.kicad_sym")(options "")(descr ""))
+  (lib (name "SolderPad_TestPoint")(type "KiCad")(uri "C:/Users/rvdbogae/Downloads/SolderPad_TestPoint.kicad_sym")(options "")(descr ""))
+)
