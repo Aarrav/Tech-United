@@ -6,7 +6,7 @@
 
 const char* WIFI_SSID  = "Tech_United";       
 const char* WIFI_PASS  = "RoboCupMSL";
-const char* LAPTOP_IP  = "10.0.0.20";
+const char* LAPTOP_IP  = "10.0.0.30";
 const int   UDP_PORT   = 5005;
 const int   SEND_HZ    = 50;
 
