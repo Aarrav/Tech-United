@@ -1,4 +1,15 @@
 #include <Arduino.h>
+#include <WiFi.h>
+#include <WiFiUdp.h>
+
+// WiFi credentials
+const char* WIFI_SSID  = "Tech_United";       
+const char* WIFI_PASS  = "RoboCupMSL";
+
+// UDP settings
+const char* laptopIP = "10.0.0.238";  // Your laptop's IP
+const int udpPort = 5005;
+WiFiUDP udp;
 
 // Timing variables
 unsigned long lastSampleTime = 0;
@@ -12,7 +23,27 @@ const float alpha = 0.2; // Smoothing factor: 0.0 to 1.0 (Lower = smoother)
 bool firstSample = true; // Flag to initialize the filter on the first pass
 
 void setup() {
-  Serial.begin(9600);
+  Serial.begin(115200);
+  delay(100);
+
+  // Connect to WiFi
+  Serial.println("\n\nStarting WiFi connection...");
+  WiFi.begin(WIFI_SSID, WIFI_PASS);
+
+  int attempts = 0;
+  while (WiFi.status() != WL_CONNECTED && attempts < 20) {
+    delay(500);
+    Serial.print(".");
+    attempts++;
+  }
+
+  if (WiFi.status() == WL_CONNECTED) {
+    Serial.println("\nWiFi connected!");
+    Serial.print("IP address: ");
+    Serial.println(WiFi.localIP());
+  } else {
+    Serial.println("\nFailed to connect to WiFi");
+  }
 }
 
 void loop() {
@@ -36,11 +67,22 @@ void loop() {
     }
   }
 
-  // Step 2: Execute printing every 30ms
+  // Step 2: Send via UDP every 30ms
   if (currentMillis - lastPrintTime >= printInterval) {
     lastPrintTime = currentMillis;
-    
-    // Print the smoothed result
-    Serial.println(smoothedVoltage, 2); 
+
+    if (WiFi.status() == WL_CONNECTED) {
+      char buffer[64];
+      sprintf(buffer, "%lu,%.2f", currentMillis, smoothedVoltage);
+
+      udp.beginPacket(laptopIP, udpPort);
+      udp.write((uint8_t*)buffer, strlen(buffer));
+      udp.endPacket();
+    }
+
+    // Also print to serial for debugging
+    Serial.print(currentMillis);
+    Serial.print(" ms, ");
+    Serial.println(smoothedVoltage, 2);
   }
 }
